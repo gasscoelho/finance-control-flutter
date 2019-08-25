@@ -4,11 +4,11 @@ A simple mobile application to control your finances.
 
 ## Built With
 
-* [Flutter](https://flutter.dev/){:target="_blank"}
+* [Flutter](https://flutter.dev/)
 
 ## Aditional Packages
 
-* [Path Provider](https://pub.dev/packages/path_provider){:target="_blank"}
+* [Path Provider](https://pub.dev/packages/path_provider)
 
 ## Authors
 
