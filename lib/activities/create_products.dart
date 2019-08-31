@@ -9,6 +9,13 @@ class _CreateProductsState extends State<CreateProducts> {
   final controlType = TextEditingController();
   final controlDesc = TextEditingController();
   final controlValue = TextEditingController();
+  var _type = 'C';
+
+  void _setType(type){
+    setState(() {
+      _type = type;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +33,21 @@ class _CreateProductsState extends State<CreateProducts> {
         padding: const EdgeInsets.all(30.0),
         child: Column(
           children: <Widget>[
-            TextField(
-              controller: controlType,
-              decoration: InputDecoration(labelText: "Type"),
+            Row(
+              children: <Widget>[
+                Radio(
+                  groupValue: _type,
+                  value: 'C',
+                  onChanged: _setType,
+                ),
+                Text('Credit'),
+                Radio(
+                  groupValue: _type,
+                  value: 'D',
+                  onChanged: _setType,
+                ),
+                Text('Debit'),
+              ],
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
@@ -55,7 +74,7 @@ class _CreateProductsState extends State<CreateProducts> {
     Map<String, dynamic> item = Map();
     item['id'] = TimeOfDay.now().toString();
     item['description'] = controlDesc.text;
-    item['type'] = controlType.text;
+    item['type'] = _type;
     item['value'] = controlValue.text;
     Navigator.pop(context, item);
   }

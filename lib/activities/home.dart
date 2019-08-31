@@ -44,13 +44,13 @@ class _HomeState extends State<Home> {
                   onChanged: (bool) {},
                   value: false,
                   secondary: CircleAvatar(
-                    child: (_listExpenses[index]['type']) == "credit"
+                    child: (_listExpenses[index]['type']) == "C"
                         ? Icon(
                             Icons.add,
                             color: Color(0xffffffff),
                           )
                         : Icon(Icons.remove, color: Color(0xffffffff)),
-                    backgroundColor: (_listExpenses[index]['type']) == "credit"
+                    backgroundColor: (_listExpenses[index]['type']) == "C"
                         ? Color(0xffF4B400)
                         : Color(0xffDB4437),
                   )),
