@@ -1,5 +1,7 @@
 import 'package:finance_control/helpers/transaction_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart' as prefix0;
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
 class CreateProducts extends StatefulWidget {
@@ -136,12 +138,25 @@ class _CreateProductsState extends State<CreateProducts> {
     if (_transactionEdit == null) {
       t = await transactionHelper.savetransacao(Transaction.fromMap(item));
       debugPrint(t.toString());
-    Navigator.pop(context, t.id != null ? true : false);
+      Fluttertoast.showToast(
+          msg: "Item created!",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIos: 3,
+          fontSize: 16.0);
+      Navigator.pop(context, t.id != null ? true : false);
     } else {
       item[idColumn] = _transactionEdit.id;
-      int i = await transactionHelper.updatetransacao(Transaction.fromMap(item));   
+      int i =
+          await transactionHelper.updatetransacao(Transaction.fromMap(item));
       debugPrint(i.toString());
-    Navigator.pop(context, i != 0 ? true : false);
+      Fluttertoast.showToast(
+          msg: "Item updated!",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIos: 3,
+          fontSize: 16.0);
+      Navigator.pop(context, i != 0 ? true : false);
     }
   }
 }

@@ -27,6 +27,7 @@ dependencies:
   sqflite: ^1.1.6 #sqlite
   intl: ^0.15.8 #intl
   shared_preferences: ^0.5.3+4 #shared preferences
+  fluttertoast: ^3.1.2 #toast
 
 dev_dependencies:
   flutter_test:
