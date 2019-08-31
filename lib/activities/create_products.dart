@@ -141,7 +141,7 @@ class _CreateProductsState extends State<CreateProducts> {
       Fluttertoast.showToast(
           msg: "Item created!",
           toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.CENTER,
+          gravity: ToastGravity.BOTTOM,
           timeInSecForIos: 3,
           fontSize: 16.0);
       Navigator.pop(context, t.id != null ? true : false);
@@ -153,7 +153,7 @@ class _CreateProductsState extends State<CreateProducts> {
       Fluttertoast.showToast(
           msg: "Item updated!",
           toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.CENTER,
+          gravity: ToastGravity.BOTTOM,
           timeInSecForIos: 3,
           fontSize: 16.0);
       Navigator.pop(context, i != 0 ? true : false);
