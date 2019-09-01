@@ -1,129 +1,132 @@
 import 'dart:async';
-
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-final String transacaoTable = "transacaoTable";
+final String transactionTable = "transactionTable";
 final String idColumn = "idColumn";
-final String valorColumn = "valorColumn";
-final String dataColumn = "dataColumn";
-final String descricaoColumn = "descricaoColumn";
-final String tipoColumn = "tipoColumn";
-final String costCategoryColumn = "costCategoryColumn";
+final String valueColumn = "valueColumn";
+final String dateColumn = "dateColumn";
+final String descriptionColumn = "descriptionColumn";
+final String typeColumn = "typeColumn";
+final String groupColumn = "groupColumn";
 
 class TransactionHelper {
-
   static final TransactionHelper _instance = TransactionHelper.internal();
-
   factory TransactionHelper() => _instance;
-
   TransactionHelper.internal();
+  Database _database;
 
-  Database _db;
-
-  Future<Database> get db async {
-    if(_db != null){
-      return _db;
+  Future<Database> get database async {
+    if (_database != null) {
+      return _database;
     } else {
-      _db = await initDb();
-      return _db;
+      _database = await initializeDatabase();
+      return _database;
     }
   }
 
-  Future<Database> initDb() async {
+  Future<Database> initializeDatabase() async {
     final databasesPath = await getDatabasesPath();
     final path = join(databasesPath, "financeControl.db");
 
-    return await openDatabase(path, version: 1, onCreate: (Database db, int newerVersion) async {
-      await db.execute(
-        "CREATE TABLE $transacaoTable($idColumn INTEGER PRIMARY KEY, $valorColumn REAL, $descricaoColumn TEXT,"
-            "$tipoColumn TEXT, $dataColumn TEXT, $costCategoryColumn TEXT)"
-      );
+    return await openDatabase(path, version: 1,
+        onCreate: (Database databse, int newerVersion) async {
+      await databse.execute(
+          "CREATE TABLE $transactionTable($idColumn INTEGER PRIMARY KEY, $valueColumn REAL, $descriptionColumn TEXT,"
+          "$typeColumn TEXT, $dateColumn TEXT, $groupColumn TEXT)");
     });
   }
 
-  Future<Transaction> savetransacao(Transaction transacao) async {
-    Database dbTransacao = await db;
-    transacao.id = await dbTransacao.insert(transacaoTable, transacao.toMap());
-    return transacao;
+  Future<Transaction> saveTransaction(Transaction transaction) async {
+    Database databaseTransaction = await database;
+    transaction.id =
+        await databaseTransaction.insert(transactionTable, transaction.toMap());
+    return transaction;
   }
 
-  Future<Transaction> gettransacao(int id) async {
-    Database dbTransacao = await db;
-    List<Map> maps = await dbTransacao.query(transacaoTable,
-      columns: [idColumn, valorColumn, descricaoColumn, tipoColumn, dataColumn, costCategoryColumn],
-      where: "$idColumn = ?",
-      whereArgs: [id]);
-    if(maps.length > 0){
+  Future<Transaction> getTransaction(int id) async {
+    Database databaseTransaction = await database;
+    List<Map> maps = await databaseTransaction.query(transactionTable,
+        columns: [
+          idColumn,
+          valueColumn,
+          descriptionColumn,
+          typeColumn,
+          dateColumn,
+          groupColumn
+        ],
+        where: "$idColumn = ?",
+        whereArgs: [id]);
+    if (maps.length > 0) {
       return Transaction.fromMap(maps.first);
     } else {
       return null;
     }
   }
 
-  Future<int> deletetransacao(int id) async {
-    Database dbTransacao = await db;
-    return await dbTransacao.delete(transacaoTable, where: "$idColumn = ?", whereArgs: [id]);
+  Future<int> deleteTransaction(int id) async {
+    Database databaseTransaction = await database;
+    return await databaseTransaction
+        .delete(transactionTable, where: "$idColumn = ?", whereArgs: [id]);
   }
 
-  Future<int> updatetransacao(Transaction transacao) async {
-    Database dbTransacao = await db;
-    return await dbTransacao.update(transacaoTable,
-        transacao.toMap(),
-        where: "$idColumn = ?",
-        whereArgs: [transacao.id]);
+  Future<int> updateTransaction(Transaction transacao) async {
+    Database dbTransacao = await database;
+    return await dbTransacao.update(transactionTable, transacao.toMap(),
+        where: "$idColumn = ?", whereArgs: [transacao.id]);
   }
 
-  Future<List> getAlltransacaos() async {
-    Database dbTransacao = await db;
-    List listMap = await dbTransacao.rawQuery("SELECT * FROM $transacaoTable");
-    List<Transaction> listtransacao = List();
-    for(Map m in listMap){
-      listtransacao.add(Transaction.fromMap(m));
+  Future<List> getTransactions() async {
+    Database databaseTransaction = await database;
+    List listMap =
+        await databaseTransaction.rawQuery("SELECT * FROM $transactionTable");
+    List<Transaction> listTransaction = List();
+    for (Map m in listMap) {
+      listTransaction.add(Transaction.fromMap(m));
     }
-    return listtransacao;
+    return listTransaction;
   }
 
-  Future<int> getNumber() async {
-    Database dbTransacao = await db;
-    return Sqflite.firstIntValue(await dbTransacao.rawQuery("SELECT COUNT(*) FROM $transacaoTable"));
+  Future<int> getCount() async {
+    Database databaseTransaction = await database;
+    return Sqflite.firstIntValue(
+        await databaseTransaction.rawQuery("SELECT COUNT(*) FROM $transactionTable"));
   }
 
   Future close() async {
-    Database dbTransacao = await db;
-    dbTransacao.close();
+    Database databaseTransaction = await database;
+    databaseTransaction.close();
   }
-
 }
 
 class Transaction {
   int id;
-  double valor;
-  String data;
-  String tipo;
-  String descricao;
-  String costCategory;
+  double value;
+  String date;
+  String type;
+  String description;
+  String group;
 
   Transaction();
 
-  Transaction.fromMap(Map map){
+  Transaction.fromMap(Map map) {
     id = map[idColumn];
-    valor = map[valorColumn];
-    data = map[dataColumn];
-    descricao = map[descricaoColumn];
-    tipo = map[tipoColumn];
-    costCategory = map[costCategoryColumn];
+    value = map[valueColumn];
+    date = map[dateColumn];
+    description = map[descriptionColumn];
+    type = map[typeColumn];
+    group = map[groupColumn];
   }
 
   Map toMap() {
     Map<String, dynamic> map = {
-      valorColumn: valor,
-      dataColumn: data,
-      descricaoColumn: descricao,
-      tipoColumn: tipo,
-      costCategoryColumn: costCategory
+      valueColumn: value,
+      dateColumn: date,
+      descriptionColumn: description,
+      typeColumn: type,
+      groupColumn: group
     };
-    if(id != null){
+    if (id != null) {
       map[idColumn] = id;
     }
     return map;
@@ -131,7 +134,6 @@ class Transaction {
 
   @override
   String toString() {
-    return "transacao(id: $id, valor: $valor, data: $data, descricao: $descricao, tipo: $tipo)";
+    return "transaction(id: $id, value: $value, date: $date, description: $description, type: $type)";
   }
-
 }
