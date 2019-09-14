@@ -1,8 +1,18 @@
+import 'dart:convert';
+
 import 'package:finance_control/activities/create_products.dart';
 import 'package:finance_control/helpers/transaction_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+
+const url = 'https://api.bitcointrade.com.br/v2/public/BRLBTC/ticker';
+
+Future<Map> getResultAPI() async {
+  var response = await http.get(url);
+  return json.decode(response.body);
+}
 
 class Home extends StatefulWidget {
   @override
@@ -17,36 +27,70 @@ class _HomeState extends State<Home> {
   bool _isVisibleFloatButton = true;
   int _tempIndex;
   Transaction _tempExpenses;
+  dynamic text;
 
   @override
   initState() {
     super.initState();
     loadData();
     setColorsButtons();
+    debugPrint(getResultAPI().toString());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Finance Control"),
+      appBar: AppBar(
+        title: Text("Finance Control"),
+        backgroundColor: Color(0xff4285F4),
+      ),
+      backgroundColor: Color(0xfff2f2f2),
+      floatingActionButton: Visibility(
+        visible: _isVisibleFloatButton,
+        child: FloatingActionButton(
+          onPressed: () {
+            _routeCreateProductsActivity();
+          },
+          child: Icon(Icons.add),
           backgroundColor: Color(0xff4285F4),
         ),
-        backgroundColor: Color(0xfff2f2f2),
-        floatingActionButton: Visibility(
-          visible: _isVisibleFloatButton,
-          child: FloatingActionButton(
-            onPressed: () {
-              _routeCreateProductsActivity();
-            },
-            child: Icon(Icons.add),
-            backgroundColor: Color(0xff4285F4),
+      ),
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(15, 15, 0, 0),
+            child: Row(
+              children: <Widget>[
+                FutureBuilder(
+                  future: getResultAPI(),
+                  builder: (context,snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.none:
+                      case ConnectionState.waiting:
+                        return Text('Waiting...');
+                        break;
+                      default:
+                        if (snapshot.hasError) {
+                          return Text('Error loading data from API');
+                        } else {
+                          return Text(snapshot.data["data"]["last"].toString());
+                        }
+                    }
+                  },
+                ),
+                Text('BTC')
+              ],
+            ),
           ),
-        ),
-        body: ListView.builder(
-          itemCount: _listExpenses.length,
-          itemBuilder: _buildItem,
-        ));
+          Expanded(
+            child: ListView.builder(
+              itemCount: _listExpenses.length,
+              itemBuilder: _buildItem,
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   Widget _buildItem(context, index) {
