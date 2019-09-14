@@ -12,6 +12,8 @@ A simple mobile application to control your finances..
 * [Fluttertoast](https://pub.dev/packages/fluttertoast)
 * [Shared Preferences](https://pub.dev/packages/shared_preferences)
 * [SQFLite](https://pub.dev/packages/sqflite)
+* [Share](https://pub.dev/packages/share)
+* [HTTP](https://pub.dev/packages/http)
 
 ## Authors
 
