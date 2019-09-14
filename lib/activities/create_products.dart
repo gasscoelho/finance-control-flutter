@@ -1,6 +1,5 @@
 import 'package:finance_control/helpers/transaction_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart' as prefix0;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
@@ -17,41 +16,25 @@ class _CreateProductsState extends State<CreateProducts> {
   final controlDesc = TextEditingController();
   final controlValue = TextEditingController();
   var _type = 'C';
-  String _currentCost;
-  List<String> _listCost = ['Courses', 'Food', 'Games', 'Transport'];
+  String _currentGroup;
+  List<String> _listGroupCost = ['Courses', 'Food', 'Games', 'Transport'];
   List<DropdownMenuItem<String>> _dropDownMenuItems;
-
-  void _setType(type) {
-    setState(() {
-      _type = type;
-    });
-  }
-
-  List<DropdownMenuItem<String>> getDropDownMenuItems() {
-    List<DropdownMenuItem<String>> items = new List();
-    for (String i in _listCost) {
-      items.add(new DropdownMenuItem(value: i, child: new Text(i)));
-    }
-    return items;
-  }
-
   Transaction _transactionEdit;
 
   @override
   void initState() {
     super.initState();
     _dropDownMenuItems = getDropDownMenuItems();
-    _currentCost = _dropDownMenuItems[0].value;
-
+    _currentGroup = _dropDownMenuItems[0].value;
     _transactionEdit = widget.transactionUpdate;
 
     if (widget.transactionUpdate != null) {
-      //Update
+      //Update product
       _transactionEdit = Transaction.fromMap(widget.transactionUpdate.toMap());
-      controlDesc.text = _transactionEdit.descricao;
-      controlValue.text = _transactionEdit.valor.toString();
-      _type = _transactionEdit.tipo;
-      _currentCost = _transactionEdit.costCategory;
+      controlDesc.text = _transactionEdit.description;
+      controlValue.text = _transactionEdit.value.toString();
+      _type = _transactionEdit.type;
+      _currentGroup = _transactionEdit.group;
     } else {
       _transactionEdit = null;
     }
@@ -94,11 +77,11 @@ class _CreateProductsState extends State<CreateProducts> {
               width: double.infinity,
               child: DropdownButton(
                 isExpanded: true,
-                value: _currentCost,
+                value: _currentGroup,
                 items: _dropDownMenuItems,
                 onChanged: (v) {
                   setState(() {
-                    _currentCost = v;
+                    _currentGroup = v;
                   });
                 },
               ),
@@ -124,19 +107,32 @@ class _CreateProductsState extends State<CreateProducts> {
     );
   }
 
+  void _setType(type) {
+    setState(() {
+      _type = type;
+    });
+  }
+
+  List<DropdownMenuItem<String>> getDropDownMenuItems() {
+    List<DropdownMenuItem<String>> items = new List();
+    for (String i in _listGroupCost) {
+      items.add(new DropdownMenuItem(value: i, child: new Text(i)));
+    }
+    return items;
+  }
+
   void _saveProducts() async {
+    Transaction t;
     TransactionHelper transactionHelper = TransactionHelper();
     Map<String, dynamic> item = Map();
-//    item[idColumn] = TimeOfDay.now().toString();
-    item[descricaoColumn] = controlDesc.text;
-    item[tipoColumn] = _type;
-    item[valorColumn] = double.parse(controlValue.text);
-    item[costCategoryColumn] = _currentCost;
-    item[dataColumn] = DateFormat("dd-MM-yyyy").format(DateTime.now());
+    item[descriptionColumn] = controlDesc.text;
+    item[typeColumn] = _type;
+    item[valueColumn] = double.parse(controlValue.text);
+    item[groupColumn] = _currentGroup;
+    item[dateColumn] = DateFormat("dd-MM-yyyy").format(DateTime.now());
 
-    Transaction t;
     if (_transactionEdit == null) {
-      t = await transactionHelper.savetransacao(Transaction.fromMap(item));
+      t = await transactionHelper.saveTransaction(Transaction.fromMap(item));
       debugPrint(t.toString());
       Fluttertoast.showToast(
           msg: "Item created!",
@@ -148,7 +144,7 @@ class _CreateProductsState extends State<CreateProducts> {
     } else {
       item[idColumn] = _transactionEdit.id;
       int i =
-          await transactionHelper.updatetransacao(Transaction.fromMap(item));
+          await transactionHelper.updateTransaction(Transaction.fromMap(item));
       debugPrint(i.toString());
       Fluttertoast.showToast(
           msg: "Item updated!",

@@ -8,7 +8,10 @@ A simple mobile application to control your finances..
 
 ## Aditional Packages
 
-* [Path Provider](https://pub.dev/packages/path_provider)
+* [Intl](https://pub.dev/packages/intl)
+* [Fluttertoast](https://pub.dev/packages/fluttertoast)
+* [Shared Preferences](https://pub.dev/packages/shared_preferences)
+* [SQFLite](https://pub.dev/packages/sqflite)
 
 ## Authors
 

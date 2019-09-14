@@ -1,10 +1,6 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:finance_control/activities/create_products.dart';
 import 'package:finance_control/helpers/transaction_helper.dart';
-
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
@@ -25,26 +21,6 @@ class _HomeState extends State<Home> {
     setColorsButtons();
   }
 
-  void setColorsButtons() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    if (sharedPreferences.getInt("creditColor") == null) 
-      sharedPreferences.setInt("creditColor", 0xffF4B400);
-
-    if (sharedPreferences.getInt("debitColor") == null)
-      sharedPreferences.setInt("debitColor", 0xffDB4437);
-
-      _creditColor = sharedPreferences.getInt("creditColor");
-      _debitColor = sharedPreferences.getInt("debitColor");
-  }
-
-  void loadData() {
-    transactionHelper.getAlltransacaos().then((list) {
-      setState(() {
-        _listExpenses = list;
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +31,7 @@ class _HomeState extends State<Home> {
         backgroundColor: Color(0xfff2f2f2),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            _createProductsActivity();
+            _routeCreateProductsActivity();
           },
           child: Icon(Icons.add),
           backgroundColor: Color(0xff4285F4),
@@ -67,20 +43,20 @@ class _HomeState extends State<Home> {
               padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
               child: ListTile(
                 leading: CircleAvatar(
-                  child: (_listExpenses[index].tipo) == "C"
+                  child: (_listExpenses[index].type) == "C"
                       ? Icon(
                           Icons.add,
                           color: Color(0xffffffff),
                         )
                       : Icon(Icons.remove, color: Color(0xffffffff)),
-                  backgroundColor: (_listExpenses[index].tipo) == "C"
+                  backgroundColor: (_listExpenses[index].type) == "C"
                       ? Color(_creditColor)
                       : Color(_debitColor),
                 ),
                 title: Text(
-                    "${_listExpenses[index].descricao} - \$${_listExpenses[index].valor} "),
+                    "${_listExpenses[index].description} - \$${_listExpenses[index].value} "),
                 onTap: () {
-                  _createProductsActivity(item: _listExpenses[index]);
+                  _routeCreateProductsActivity(item: _listExpenses[index]);
                 },
               ),
             );
@@ -88,19 +64,35 @@ class _HomeState extends State<Home> {
         ));
   }
 
-  void _createProductsActivity({Transaction item}) async {
+  void _routeCreateProductsActivity({Transaction item}) async {
     final _products = await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => CreateProducts(
                   transactionUpdate: item,
                 )));
-
     if (_products) {
       loadData();
     }
-    /*if (_products != null) {
-      _listExpenses.add(_products);
-    }*/
+  }
+
+  void setColorsButtons() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if (sharedPreferences.getInt("creditColor") == null)
+      sharedPreferences.setInt("creditColor", 0xffF4B400);
+
+    if (sharedPreferences.getInt("debitColor") == null)
+      sharedPreferences.setInt("debitColor", 0xffDB4437);
+
+    _creditColor = sharedPreferences.getInt("creditColor");
+    _debitColor = sharedPreferences.getInt("debitColor");
+  }
+
+  void loadData() {
+    transactionHelper.getTransactions().then((list) {
+      setState(() {
+        _listExpenses = list;
+      });
+    });
   }
 }
