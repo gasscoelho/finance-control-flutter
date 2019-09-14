@@ -1,6 +1,7 @@
 import 'package:finance_control/activities/create_products.dart';
 import 'package:finance_control/helpers/transaction_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
@@ -13,6 +14,7 @@ class _HomeState extends State<Home> {
   List<Transaction> _listExpenses = [];
   int _creditColor;
   int _debitColor;
+  bool _isVisibleFloatButton = true;
 
   @override
   initState() {
@@ -29,12 +31,15 @@ class _HomeState extends State<Home> {
           backgroundColor: Color(0xff4285F4),
         ),
         backgroundColor: Color(0xfff2f2f2),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            _routeCreateProductsActivity();
-          },
-          child: Icon(Icons.add),
-          backgroundColor: Color(0xff4285F4),
+        floatingActionButton: Visibility(
+          visible: _isVisibleFloatButton,
+          child: FloatingActionButton(
+            onPressed: () {
+              _routeCreateProductsActivity();
+            },
+            child: Icon(Icons.add),
+            backgroundColor: Color(0xff4285F4),
+          ),
         ),
         body: ListView.builder(
           itemCount: _listExpenses.length,
@@ -58,7 +63,7 @@ class _HomeState extends State<Home> {
                 onTap: () {
                   _routeCreateProductsActivity(item: _listExpenses[index]);
                 },
-                onLongPress: (){
+                onLongPress: () {
                   _menu(context, index);
                 },
               ),
@@ -68,24 +73,57 @@ class _HomeState extends State<Home> {
   }
 
   void _menu(context, index) {
-    showBottomSheet(
+    setState(() {
+      _isVisibleFloatButton = false;
+    });
+    showModalBottomSheet(
         context: context,
         builder: (context) {
-          return Container(
-            child: Column(
-              children: <Widget>[
-                FlatButton(
-                  child: Text('Share'),
-                  onPressed: () {},
+          return BottomSheet(
+            builder: (BuildContext context) {
+              return Container(
+                width: double.infinity,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FlatButton(
+                        child: Text('Share'),
+                        onPressed: () {
+                          Share.share(
+                              "${_listExpenses[index].description} - \$${_listExpenses[index].value} ");
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FlatButton(
+                        child: Text('Some text'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          setState(() {
+                            _isVisibleFloatButton = true;
+                          });
+                        },
+                      ),
+                    )
+                  ],
                 ),
-                FlatButton(
-                  child: Text('Some text'),
-                  onPressed: () {},
-                )
-              ],
-            ),
+              );
+            },
+            onClosing: () {},
           );
-        });
+        }).then((value) {
+      setState(() {
+        _isVisibleFloatButton = true;
+      });
+      debugPrint('CLOSED');
+    });
+
+    debugPrint('Closed ' + _isVisibleFloatButton.toString()); // Closed true
+    _listExpenses[index].description;
+    debugPrint('Closed $_isVisibleFloatButton');
   }
 
   void _routeCreateProductsActivity({Transaction item}) async {
