@@ -20,6 +20,7 @@ class _CreateProductsState extends State<CreateProducts> {
   List<String> _listGroupCost = ['Courses', 'Food', 'Games', 'Transport'];
   List<DropdownMenuItem<String>> _dropDownMenuItems;
   Transaction _transactionEdit;
+  bool _controlEdit = false;
 
   @override
   void initState() {
@@ -42,75 +43,92 @@ class _CreateProductsState extends State<CreateProducts> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title:
-            Text(_transactionEdit == null ? "Add Product" : "Update Product"),
-        backgroundColor: Color(0xff4285F4),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _saveProducts,
-        child: Icon(Icons.check),
-      ),
-      resizeToAvoidBottomPadding: false,
-      body: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Radio(
-                  groupValue: _type,
-                  value: 'C',
-                  onChanged: _setType,
+    return WillPopScope(
+      onWillPop: _controlPop,
+      child: Scaffold(
+        appBar: AppBar(
+          title:
+              Text(_transactionEdit == null ? "Add Product" : "Update Product"),
+          backgroundColor: Color(0xff4285F4),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _saveProducts,
+          child: Icon(Icons.check),
+        ),
+        resizeToAvoidBottomPadding: false,
+        body: Padding(
+          padding: const EdgeInsets.all(30.0),
+          child: Column(
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Radio(
+                    groupValue: _type,
+                    value: 'C',
+                    onChanged: _setType,
+                  ),
+                  Text('Credit'),
+                  Radio(
+                    groupValue: _type,
+                    value: 'D',
+                    onChanged: _setType,
+                  ),
+                  Text('Debit'),
+                ],
+              ),
+              Container(
+                width: double.infinity,
+                child: DropdownButton(
+                  isExpanded: true,
+                  value: _currentGroup,
+                  items: _dropDownMenuItems,
+                  onChanged: (v) {
+                    _controlEdit = true;
+                    setState(() {
+                      _currentGroup = v;
+                    });
+                  },
                 ),
-                Text('Credit'),
-                Radio(
-                  groupValue: _type,
-                  value: 'D',
-                  onChanged: _setType,
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
+                child: TextField(
+                  controller: controlDesc,
+                  onChanged: (input){
+                    _controlEdit = true;
+                  },
+                  decoration: InputDecoration(labelText: "Product"),
                 ),
-                Text('Debit'),
-              ],
-            ),
-            Container(
-              width: double.infinity,
-              child: DropdownButton(
-                isExpanded: true,
-                value: _currentGroup,
-                items: _dropDownMenuItems,
-                onChanged: (v) {
-                  setState(() {
-                    _currentGroup = v;
-                  });
-                },
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
-              child: TextField(
-                controller: controlDesc,
-                decoration: InputDecoration(labelText: "Product"),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
+                child: TextField(
+                  controller: controlValue,
+                  onChanged: (input){
+                    _controlEdit = true;
+                  },
+                  decoration: InputDecoration(labelText: "Value"),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
-              child: TextField(
-                controller: controlValue,
-                decoration: InputDecoration(labelText: "Value"),
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
   void _setType(type) {
+    _controlEdit = true;
     setState(() {
       _type = type;
     });
+  }
+
+  Future<bool> _controlPop(){
+    if(_controlEdit){
+      debugPrint('Warning: data not saved!');
+    }
   }
 
   List<DropdownMenuItem<String>> getDropDownMenuItems() {
