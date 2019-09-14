@@ -47,6 +47,13 @@ class _CreateProductsState extends State<CreateProducts> {
       onWillPop: _controlPop,
       child: Scaffold(
         appBar: AppBar(
+          /*leading: IconButton(
+            icon: Icon(Icons.close),
+            onPressed: () {
+              if(!_controlEdit)
+                Navigator.pop(context, false);
+            },
+          ), */
           title:
               Text(_transactionEdit == null ? "Add Product" : "Update Product"),
           backgroundColor: Color(0xff4285F4),
@@ -94,7 +101,7 @@ class _CreateProductsState extends State<CreateProducts> {
                 padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
                 child: TextField(
                   controller: controlDesc,
-                  onChanged: (input){
+                  onChanged: (input) {
                     _controlEdit = true;
                   },
                   decoration: InputDecoration(labelText: "Product"),
@@ -104,7 +111,7 @@ class _CreateProductsState extends State<CreateProducts> {
                 padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
                 child: TextField(
                   controller: controlValue,
-                  onChanged: (input){
+                  onChanged: (input) {
                     _controlEdit = true;
                   },
                   decoration: InputDecoration(labelText: "Value"),
@@ -125,10 +132,42 @@ class _CreateProductsState extends State<CreateProducts> {
     });
   }
 
-  Future<bool> _controlPop(){
-    if(_controlEdit){
+  Future<bool> _controlPop() {
+    if (_controlEdit) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Warning'),
+              content: Text(
+                  'You haven\'t saved your changes. Are you sure you want to leave?'),
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Leave Alert
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ),
+                FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Leave Alert
+                    Navigator.pop(context); // Leave Screen
+                  },
+                  child: Text(
+                    'Confirm',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                )
+              ],
+            );
+          });
       debugPrint('Warning: data not saved!');
+      return Future.value(false);
     }
+    return Future.value(true);
   }
 
   List<DropdownMenuItem<String>> getDropDownMenuItems() {

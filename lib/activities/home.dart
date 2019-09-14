@@ -58,10 +58,34 @@ class _HomeState extends State<Home> {
                 onTap: () {
                   _routeCreateProductsActivity(item: _listExpenses[index]);
                 },
+                onLongPress: (){
+                  _menu(context, index);
+                },
               ),
             );
           },
         ));
+  }
+
+  void _menu(context, index) {
+    showBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            child: Column(
+              children: <Widget>[
+                FlatButton(
+                  child: Text('Share'),
+                  onPressed: () {},
+                ),
+                FlatButton(
+                  child: Text('Some text'),
+                  onPressed: () {},
+                )
+              ],
+            ),
+          );
+        });
   }
 
   void _routeCreateProductsActivity({Transaction item}) async {
@@ -71,7 +95,7 @@ class _HomeState extends State<Home> {
             builder: (context) => CreateProducts(
                   transactionUpdate: item,
                 )));
-    if (_products) {
+    if (_products != null && _products == true) {
       loadData();
     }
   }
