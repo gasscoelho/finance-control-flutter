@@ -15,6 +15,8 @@ class _HomeState extends State<Home> {
   int _creditColor;
   int _debitColor;
   bool _isVisibleFloatButton = true;
+  int _tempIndex;
+  Transaction _tempExpenses;
 
   @override
   initState() {
@@ -43,33 +45,73 @@ class _HomeState extends State<Home> {
         ),
         body: ListView.builder(
           itemCount: _listExpenses.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
-              child: ListTile(
-                leading: CircleAvatar(
-                  child: (_listExpenses[index].type) == "C"
-                      ? Icon(
-                          Icons.add,
-                          color: Color(0xffffffff),
-                        )
-                      : Icon(Icons.remove, color: Color(0xffffffff)),
-                  backgroundColor: (_listExpenses[index].type) == "C"
-                      ? Color(_creditColor)
-                      : Color(_debitColor),
-                ),
-                title: Text(
-                    "${_listExpenses[index].description} - \$${_listExpenses[index].value} "),
-                onTap: () {
-                  _routeCreateProductsActivity(item: _listExpenses[index]);
-                },
-                onLongPress: () {
-                  _menu(context, index);
-                },
-              ),
-            );
-          },
+          itemBuilder: _buildItem,
         ));
+  }
+
+  Widget _buildItem(context, index) {
+    return Dismissible(
+      key: Key(DateTime.now().millisecondsSinceEpoch.toString()),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        color: Colors.red,
+        child: Align(
+          alignment: Alignment(0.9, 0),
+          child: Icon(
+            Icons.delete_forever,
+            color: Colors.white,
+          ),
+        ),
+      ),
+      onDismissed: (direction) {
+        _tempExpenses = _listExpenses[index];
+        _tempIndex = index;
+
+        transactionHelper.deleteTransaction(_listExpenses[index].id);
+        _listExpenses.removeAt(index);
+
+        final _snack = SnackBar(
+          content:
+              Text('${_tempExpenses.description} was sucessfully removed.'),
+          duration: Duration(seconds: 3),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () {
+              setState(() {
+                _listExpenses.insert(_tempIndex, _tempExpenses);
+                transactionHelper.saveTransaction(_tempExpenses);
+              });
+            },
+          ),
+        );
+        Scaffold.of(context).removeCurrentSnackBar();
+        Scaffold.of(context).showSnackBar(_snack);
+      },
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
+        child: ListTile(
+          leading: CircleAvatar(
+            child: (_listExpenses[index].type) == "C"
+                ? Icon(
+                    Icons.add,
+                    color: Color(0xffffffff),
+                  )
+                : Icon(Icons.remove, color: Color(0xffffffff)),
+            backgroundColor: (_listExpenses[index].type) == "C"
+                ? Color(_creditColor)
+                : Color(_debitColor),
+          ),
+          title: Text(
+              "${_listExpenses[index].description} - \$${_listExpenses[index].value} "),
+          onTap: () {
+            _routeCreateProductsActivity(item: _listExpenses[index]);
+          },
+          onLongPress: () {
+            _menu(context, index);
+          },
+        ),
+      ),
+    );
   }
 
   void _menu(context, index) {
