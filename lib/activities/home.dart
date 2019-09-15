@@ -27,6 +27,7 @@ class _HomeState extends State<Home> {
   bool _isVisibleFloatButton = true;
   int _tempIndex;
   Transaction _tempExpenses;
+
   dynamic text;
 
   @override
@@ -63,7 +64,7 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 FutureBuilder(
                   future: getResultAPI(),
-                  builder: (context,snapshot) {
+                  builder: (context, snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.none:
                       case ConnectionState.waiting:
@@ -78,7 +79,6 @@ class _HomeState extends State<Home> {
                     }
                   },
                 ),
-                Text('BTC')
               ],
             ),
           ),
@@ -128,6 +128,7 @@ class _HomeState extends State<Home> {
             },
           ),
         );
+
         Scaffold.of(context).removeCurrentSnackBar();
         Scaffold.of(context).showSnackBar(_snack);
       },
@@ -204,12 +205,7 @@ class _HomeState extends State<Home> {
       setState(() {
         _isVisibleFloatButton = true;
       });
-      debugPrint('CLOSED');
     });
-
-    debugPrint('Closed ' + _isVisibleFloatButton.toString()); // Closed true
-    _listExpenses[index].description;
-    debugPrint('Closed $_isVisibleFloatButton');
   }
 
   void _routeCreateProductsActivity({Transaction item}) async {
