@@ -1,8 +1,9 @@
 import 'dart:convert';
-
 import 'package:finance_control/activities/create_products.dart';
 import 'package:finance_control/helpers/transaction_helper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -14,10 +15,32 @@ Future<Map> getResultAPI() async {
   return json.decode(response.body);
 }
 
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<Null> _loogIn() async {
+    GoogleSignInAccount user = _googleSignIn.currentUser;
+    if (user == null) {
+      user = await _googleSignIn.signInSilently();
+    }
+
+    if (user == null) {
+      user = await _googleSignIn.signIn();
+    }
+
+    if (await _auth.currentUser() == null) {
+      GoogleSignInAuthentication credential = await _googleSignIn.currentUser.authentication;
+      await _auth.signInWithCredential(GoogleAuthProvider.getCredential(idToken: credential.idToken, accessToken: credential.accessToken));
+    }
+  }
+
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
 }
+
+
 
 class _HomeState extends State<Home> {
   TransactionHelper transactionHelper = TransactionHelper();
@@ -30,6 +53,7 @@ class _HomeState extends State<Home> {
 
   dynamic text;
 
+
   @override
   initState() {
     super.initState();
@@ -40,23 +64,19 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Finance Control"),
-        backgroundColor: Color(0xff4285F4),
-      ),
-      backgroundColor: Color(0xfff2f2f2),
-      floatingActionButton: Visibility(
-        visible: _isVisibleFloatButton,
-        child: FloatingActionButton(
-          onPressed: () {
-            _routeCreateProductsActivity();
-          },
-          child: Icon(Icons.add),
-          backgroundColor: Color(0xff4285F4),
-        ),
-      ),
-      body: Column(
+    return Container(
+      // backgroundColor: Color(0xfff2f2f2),
+      // floatingActionButton: Visibility(
+      //   visible: _isVisibleFloatButton,
+      //   child: FloatingActionButton(
+      //     onPressed: () {
+      //       _routeCreateProductsActivity();
+      //     },
+      //     child: Icon(Icons.add),
+      //     backgroundColor: Color(0xff4285F4),
+      //   ),
+      // ),
+      child: Column(
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.fromLTRB(15, 15, 0, 0),
@@ -87,6 +107,14 @@ class _HomeState extends State<Home> {
               itemCount: _listExpenses.length,
               itemBuilder: _buildItem,
             ),
+          ),
+          RaisedButton(
+            onPressed: () async {
+              await _loogIn();
+              _routeCreateProductsActivity();
+            },
+            color: Color(0xff4285F4),
+            child: Text('New'),
           )
         ],
       ),

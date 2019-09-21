@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "186486990213",
+    "firebase_url": "https://finance-control-4cbb5.firebaseio.com",
+    "project_id": "finance-control-4cbb5",
+    "storage_bucket": "finance-control-4cbb5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:186486990213:android:e819178753391e9aa990ec",
+        "android_client_info": {
+          "package_name": "com.example.firstapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "186486990213-8h75iuf0l8q012eq5f56qpp0sqq8kv6g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.firstapp",
+            "certificate_hash": "6e36cd381702b26042c0ff9e1864667dd7f3a18d"
+          }
+        },
+        {
+          "client_id": "186486990213-2v464quig5nbdpc5qhafap2ruc1j379f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmrH2JSMAAHP7IjrkafqNo9CM5Pv-_TUw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "186486990213-2v464quig5nbdpc5qhafap2ruc1j379f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

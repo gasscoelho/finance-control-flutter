@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -41,6 +42,25 @@ class TransactionHelper {
     Database databaseTransaction = await database;
     transaction.id =
         await databaseTransaction.insert(transactionTable, transaction.toMap());
+
+    //TODO: THIS COMMAND LINE WILL BE REMOVE IN THE FUTURE [FIREBASE]
+    /*
+    item[descriptionColumn] = controlDesc.text;
+    item[typeColumn] = _type;
+    item[valueColumn] = double.parse(controlValue.text);
+    item[groupColumn] = _currentGroup;
+    item[dateColumn] = DateFormat("dd-MM-yyyy").format(DateTime.now());
+    */
+    Firestore.instance.collection('dados').document().setData(
+      {
+        'descriptionColumn': transaction.description,
+        'typeColumn': transaction.type,
+        'valueColumn': transaction.value,
+        'groupColumn': transaction.group,
+        'dateColumn': transaction.date
+      },
+    );
+
     return transaction;
   }
 
@@ -76,7 +96,7 @@ class TransactionHelper {
         where: "$idColumn = ?", whereArgs: [transacao.id]);
   }
 
-  Future<List> getTransactions() async {
+  Future<List> getTransactions() async { 
     Database databaseTransaction = await database;
     List listMap =
         await databaseTransaction.rawQuery("SELECT * FROM $transactionTable");
@@ -84,13 +104,25 @@ class TransactionHelper {
     for (Map m in listMap) {
       listTransaction.add(Transaction.fromMap(m));
     }
+
+    //TO DELETE IN THE FUTURE
+
+    Firestore.instance.collection('dados').getDocuments().then((snapshot){
+      snapshot.documents.forEach((result){
+        print(result['descriptionColumn']);
+        print(result['typeColumn']);
+        print(result['valueColumn']);
+        print(result['groupColumn']);
+        print(result['dateColumn']);
+      });
+    });
     return listTransaction;
   }
 
   Future<int> getCount() async {
     Database databaseTransaction = await database;
-    return Sqflite.firstIntValue(
-        await databaseTransaction.rawQuery("SELECT COUNT(*) FROM $transactionTable"));
+    return Sqflite.firstIntValue(await databaseTransaction
+        .rawQuery("SELECT COUNT(*) FROM $transactionTable"));
   }
 
   Future close() async {
