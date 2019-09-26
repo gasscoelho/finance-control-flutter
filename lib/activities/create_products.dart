@@ -1,11 +1,11 @@
 import 'package:finance_control/helpers/transaction_helper.dart';
+import 'package:finance_control/util/colors_arsenal.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
 class CreateProducts extends StatefulWidget {
   final Transaction transactionUpdate;
-
   CreateProducts({this.transactionUpdate});
 
   @override
@@ -47,27 +47,22 @@ class _CreateProductsState extends State<CreateProducts> {
       onWillPop: _controlPop,
       child: Scaffold(
         appBar: AppBar(
-          /*leading: IconButton(
-            icon: Icon(Icons.close),
-            onPressed: () {
-              if(!_controlEdit)
-                Navigator.pop(context, false);
-            },
-          ), */
           title:
               Text(_transactionEdit == null ? "Add Product" : "Update Product"),
-          backgroundColor: Color(0xff4285F4),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: _saveProducts,
-          child: Icon(Icons.check),
+          child: Icon(
+            Icons.check,
+          ),
         ),
         resizeToAvoidBottomPadding: false,
         body: Padding(
-          padding: const EdgeInsets.all(30.0),
+          padding: const EdgeInsets.fromLTRB(30.0, 15.0, 30.0, 15.0),
           child: Column(
             children: <Widget>[
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Radio(
                     groupValue: _type,
@@ -86,6 +81,7 @@ class _CreateProductsState extends State<CreateProducts> {
               Container(
                 width: double.infinity,
                 child: DropdownButton(
+                  underline: Container(color: Colors.grey, height: 1.0),
                   isExpanded: true,
                   value: _currentGroup,
                   items: _dropDownMenuItems,
@@ -97,26 +93,20 @@ class _CreateProductsState extends State<CreateProducts> {
                   },
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
-                child: TextField(
-                  controller: controlDesc,
-                  onChanged: (input) {
-                    _controlEdit = true;
-                  },
-                  decoration: InputDecoration(labelText: "Product"),
-                ),
+              TextField(
+                controller: controlDesc,
+                onChanged: (input) {
+                  _controlEdit = true;
+                },
+                decoration: InputDecoration(labelText: "Product"),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
-                child: TextField(
-                  controller: controlValue,
-                  onChanged: (input) {
-                    _controlEdit = true;
-                  },
-                  decoration: InputDecoration(labelText: "Value"),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                ),
+              TextField(
+                controller: controlValue,
+                onChanged: (input) {
+                  _controlEdit = true;
+                },
+                decoration: InputDecoration(labelText: "Value"),
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
               ),
             ],
           ),
