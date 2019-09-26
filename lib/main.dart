@@ -1,15 +1,19 @@
-import 'package:finance_control/inicio.dart';
+import 'package:finance_control/launch.dart';
+import 'package:finance_control/util/colors_arsenal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-
-void main(){
+void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Color(0xff0b51c1), // status bar color
+    statusBarColor: ColorsArsenal.primaryColorDark, // status bar color
   ));
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: Inicio(),
+    theme: ThemeData(
+        primaryColor: ColorsArsenal.primaryColor,
+        accentColor: ColorsArsenal.primaryColor,
+        cursorColor: ColorsArsenal.primaryColor),
+    home: Launch(),
   ));
 }
