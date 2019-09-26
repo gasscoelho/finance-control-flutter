@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:finance_control/activities/create_products.dart';
 import 'package:finance_control/helpers/transaction_helper.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:finance_control/util/colors_arsenal.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -15,32 +14,10 @@ Future<Map> getResultAPI() async {
   return json.decode(response.body);
 }
 
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  Future<Null> _loogIn() async {
-    GoogleSignInAccount user = _googleSignIn.currentUser;
-    if (user == null) {
-      user = await _googleSignIn.signInSilently();
-    }
-
-    if (user == null) {
-      user = await _googleSignIn.signIn();
-    }
-
-    if (await _auth.currentUser() == null) {
-      GoogleSignInAuthentication credential = await _googleSignIn.currentUser.authentication;
-      await _auth.signInWithCredential(GoogleAuthProvider.getCredential(idToken: credential.idToken, accessToken: credential.accessToken));
-    }
-  }
-
-
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
 }
-
-
 
 class _HomeState extends State<Home> {
   TransactionHelper transactionHelper = TransactionHelper();
@@ -50,51 +27,40 @@ class _HomeState extends State<Home> {
   bool _isVisibleFloatButton = true;
   int _tempIndex;
   Transaction _tempExpenses;
-
   dynamic text;
-
 
   @override
   initState() {
     super.initState();
-    loadData();
-    setColorsButtons();
+    loadData(); //load data from local database
+    setColorsButtons(); //change item color (list items)
     debugPrint(getResultAPI().toString());
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      // backgroundColor: Color(0xfff2f2f2),
-      // floatingActionButton: Visibility(
-      //   visible: _isVisibleFloatButton,
-      //   child: FloatingActionButton(
-      //     onPressed: () {
-      //       _routeCreateProductsActivity();
-      //     },
-      //     child: Icon(Icons.add),
-      //     backgroundColor: Color(0xff4285F4),
-      //   ),
-      // ),
       child: Column(
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.fromLTRB(15, 15, 0, 0),
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Row(
               children: <Widget>[
                 FutureBuilder(
+                  //this block is not being used (don't reflect on screen)
                   future: getResultAPI(),
                   builder: (context, snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.none:
                       case ConnectionState.waiting:
-                        return Text('Waiting...');
+                        return Text(''); //waiting ...
                         break;
                       default:
                         if (snapshot.hasError) {
-                          return Text('Error loading data from API');
+                          return Text(''); //error loading data from api
                         } else {
-                          return Text(snapshot.data["data"]["last"].toString());
+                          return Text('');
+                          //return Text(snapshot.data["data"]["last"].toString());
                         }
                     }
                   },
@@ -108,13 +74,31 @@ class _HomeState extends State<Home> {
               itemBuilder: _buildItem,
             ),
           ),
-          RaisedButton(
-            onPressed: () async {
-              await _loogIn();
-              _routeCreateProductsActivity();
-            },
-            color: Color(0xff4285F4),
-            child: Text('New'),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
+            child: _buildFloatActionButton(),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFloatActionButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          Visibility(
+            visible: _isVisibleFloatButton,
+            child: FloatingActionButton(
+              onPressed: () async {
+                //await _loogIn();
+                _updatedUICreateProduct();
+              },
+              backgroundColor: ColorsArsenal.primaryColor,
+              child: Icon(Icons.add),
+            ),
           )
         ],
       ),
@@ -122,6 +106,28 @@ class _HomeState extends State<Home> {
   }
 
   Widget _buildItem(context, index) {
+    final _item = ListTile(
+      leading: CircleAvatar(
+        child: (_listExpenses[index].type) == "C"
+            ? Icon(
+                Icons.add,
+                color: Color(0xffffffff),
+              )
+            : Icon(Icons.remove, color: Color(0xffffffff)),
+        backgroundColor: (_listExpenses[index].type) == "C"
+            ? Color(_creditColor)
+            : Color(_debitColor),
+      ),
+      title: Text(
+          "${_listExpenses[index].description} - \$${_listExpenses[index].value} "),
+      onTap: () {
+        _updatedUICreateProduct(item: _listExpenses[index]);
+      },
+      onLongPress: () {
+        _menu(context, index);
+      },
+    );
+
     return Dismissible(
       key: Key(DateTime.now().millisecondsSinceEpoch.toString()),
       direction: DismissDirection.endToStart,
@@ -139,17 +145,15 @@ class _HomeState extends State<Home> {
         _tempExpenses = _listExpenses[index];
         _tempIndex = index;
 
-        transactionHelper.deleteTransaction(_listExpenses[index].id);
-        _listExpenses.removeAt(index);
-
         final _snack = SnackBar(
           content:
               Text('${_tempExpenses.description} was sucessfully removed.'),
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds: 5),
           action: SnackBarAction(
             label: 'Undo',
             onPressed: () {
               setState(() {
+                //TODO: Change to BLoC
                 _listExpenses.insert(_tempIndex, _tempExpenses);
                 transactionHelper.saveTransaction(_tempExpenses);
               });
@@ -157,38 +161,22 @@ class _HomeState extends State<Home> {
           ),
         );
 
+        transactionHelper.deleteTransaction(_listExpenses[index].id);
+        _listExpenses.removeAt(index);
+
         Scaffold.of(context).removeCurrentSnackBar();
         Scaffold.of(context).showSnackBar(_snack);
       },
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
-        child: ListTile(
-          leading: CircleAvatar(
-            child: (_listExpenses[index].type) == "C"
-                ? Icon(
-                    Icons.add,
-                    color: Color(0xffffffff),
-                  )
-                : Icon(Icons.remove, color: Color(0xffffffff)),
-            backgroundColor: (_listExpenses[index].type) == "C"
-                ? Color(_creditColor)
-                : Color(_debitColor),
-          ),
-          title: Text(
-              "${_listExpenses[index].description} - \$${_listExpenses[index].value} "),
-          onTap: () {
-            _routeCreateProductsActivity(item: _listExpenses[index]);
-          },
-          onLongPress: () {
-            _menu(context, index);
-          },
-        ),
+        child: _item,
       ),
     );
   }
 
   void _menu(context, index) {
     setState(() {
+      //TODO: Change to Bloc
       _isVisibleFloatButton = false;
     });
     showModalBottomSheet(
@@ -218,6 +206,7 @@ class _HomeState extends State<Home> {
                         onPressed: () {
                           Navigator.pop(context);
                           setState(() {
+                            //TODO: change to bloc
                             _isVisibleFloatButton = true;
                           });
                         },
@@ -236,7 +225,7 @@ class _HomeState extends State<Home> {
     });
   }
 
-  void _routeCreateProductsActivity({Transaction item}) async {
+  void _updatedUICreateProduct({Transaction item}) async {
     final _products = await Navigator.push(
         context,
         MaterialPageRoute(
