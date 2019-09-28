@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:finance_control/activities/create_products.dart';
 import 'package:finance_control/helpers/transaction_helper.dart';
 import 'package:finance_control/util/colors_arsenal.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,13 +30,49 @@ class _HomeState extends State<Home> {
   int _tempIndex;
   Transaction _tempExpenses;
   dynamic text;
-
+  final FirebaseMessaging _fbm = FirebaseMessaging();
   @override
   initState() {
     super.initState();
     loadData(); //load data from local database
     setColorsButtons(); //change item color (list items)
-    debugPrint(getResultAPI().toString());
+    //debugPrint(getResultAPI().toString());
+    _registerDevice();
+    _fbm.configure(
+      onMessage: (Map<String, dynamic> msg) async {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: ListTile(
+              title: Text(msg['notification']['title']),
+              subtitle: Text(msg['notification']['body']),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Close'),
+                onPressed: (){
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          )
+        );
+      },
+      onLaunch: (Map<String, dynamic> msg) async {print(msg);},
+      onResume: (Map<String, dynamic> msg) async {print(msg);},
+    );
+  }
+
+  _registerDevice() async{
+    String token = await _fbm.getToken();
+    if (Platform.isIOS) {
+      _fbm.onIosSettingsRegistered.listen((data) {
+        _fbm.subscribeToTopic('ios');
+      });
+      _fbm.requestNotificationPermissions(IosNotificationSettings());
+    } else if (Platform.isAndroid) {
+      _fbm.subscribeToTopic('android');
+    }
   }
 
   @override

@@ -40,7 +40,7 @@ class DrawerMenu extends StatelessWidget {
                     radius: 50.0,
                     backgroundColor: ColorsArsenal.backgroundColorLight,
                     backgroundImage: NetworkImage(
-                        'https://avatars3.githubusercontent.com/u/33602013?s=400&u=67e085abb0eae2db24ce05c35da8252217c84e43&v=4'),
+                        user.photoUrl),
                   ),
                   accountEmail: Text(
                     user.email,
