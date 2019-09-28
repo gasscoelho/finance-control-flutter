@@ -23,32 +23,33 @@ class _SignInState extends State<SignIn> {
   @override
   void initState() {
     super.initState();
-    FirebaseAuth.instance.currentUser().then((user) {
-      if (user == null) {
-        print('NULO POHA');
-      } else {
-        print('User: ' + user.email);
-      }
-      FirebaseAuth.instance.signOut();
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 30.0),
-            child: _titleGoogle,
-          ),
-          GestureDetector(
-            onTap: signInWithGoogle,
-            child: _imageSignInGoogle,
-          )
-        ],
-      ),
+    return FutureBuilder(
+      future: AuthenticationHelper().currentUser(),
+      builder: (context, snapshot) {
+        if (snapshot.data == null) {
+          return Material(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 30.0),
+                  child: _titleGoogle,
+                ),
+                GestureDetector(
+                  onTap: signInWithGoogle,
+                  child: _imageSignInGoogle,
+                )
+              ],
+            ),
+          );
+        } else {
+          return Launch(snapshot.data);
+        }
+      },
     );
   }
 

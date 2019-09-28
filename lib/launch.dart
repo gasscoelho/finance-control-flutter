@@ -17,6 +17,7 @@ class Launch extends StatelessWidget {
   Widget build(BuildContext context) {
     void _logout(){
       AuthenticationHelper().signOut();
+      Navigator.pop(context);
     }
     return PageView(
       controller: null,
@@ -29,7 +30,7 @@ class Launch extends StatelessWidget {
               IconButton(
                 onPressed: _logout,
                 icon: Icon(Icons.exit_to_app),
-                color: ColorsArsenal.textColorDark,
+                color: ColorsArsenal.backgroundColorLight,
               )
             ],
           ),
