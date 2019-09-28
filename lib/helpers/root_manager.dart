@@ -15,13 +15,17 @@ class _RootManagerState extends State<RootManager> {
   @override
   void initState() {
     super.initState();
-    AuthenticationHelper().currentUser().then((user) {
-      _user = user;
-    });
+    AuthenticationHelper().signOut();
+    print('Hey');
   }
 
   @override
   Widget build(BuildContext context) {
-    return _user == null ? SignIn() : Launch(_user);
+    return FutureBuilder(
+      future: AuthenticationHelper().currentUser(),
+      builder: (context, snapshot) {
+        return snapshot.data == null ? SignIn() : Launch(snapshot.data);
+      },
+    );
   }
 }

@@ -18,6 +18,6 @@ void main() async {
         primaryColor: ColorsArsenal.primaryColor,
         accentColor: ColorsArsenal.primaryColor,
         cursorColor: ColorsArsenal.primaryColor),
-    home: RootManager(),
+    home: SignIn(),
   ));
 }

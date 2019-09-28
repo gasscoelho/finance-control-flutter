@@ -20,10 +20,17 @@ class _SignInState extends State<SignIn> {
   final _imageSignInGoogle =
       Image.asset('assets/images/google.png', height: 72.0);
 
-@override
+  @override
   void initState() {
     super.initState();
-    print('user ' + FirebaseAuth.instance.currentUser().toString());
+    FirebaseAuth.instance.currentUser().then((user) {
+      if (user == null) {
+        print('NULO POHA');
+      } else {
+        print('User: ' + user.email);
+      }
+      FirebaseAuth.instance.signOut();
+    });
   }
 
   @override
