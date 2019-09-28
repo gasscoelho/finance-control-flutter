@@ -1,10 +1,12 @@
 import 'package:finance_control/util/colors_arsenal.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class DrawerMenu extends StatelessWidget {
   final PageController _pageController;
+  final FirebaseUser user;
 
-  DrawerMenu(this._pageController);
+  DrawerMenu(this._pageController, {this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -41,12 +43,12 @@ class DrawerMenu extends StatelessWidget {
                         'https://avatars3.githubusercontent.com/u/33602013?s=400&u=67e085abb0eae2db24ce05c35da8252217c84e43&v=4'),
                   ),
                   accountEmail: Text(
-                    'gaaucocoelho@gmail.com',
+                    user.email,
                     style: TextStyle(
                         color: ColorsArsenal.textColorDark, fontSize: 16.0),
                   ),
                   accountName: Text(
-                    'Gabriel Coelho',
+                    user.displayName,
                     style: TextStyle(
                         color: ColorsArsenal.textColorDark,
                         fontSize: 20.0,
