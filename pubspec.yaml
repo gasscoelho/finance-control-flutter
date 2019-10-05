@@ -34,6 +34,7 @@ dependencies:
   google_sign_in: ^4.0.7
   firebase_auth: ^0.14.0+5
   firebase_storage: ^3.0.6
+  flutter_launcher_icons: ^0.7.3 # Flutter Launcher
 
 dev_dependencies:
   flutter_test:
@@ -81,3 +82,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/finance_control_icon_2.png"
